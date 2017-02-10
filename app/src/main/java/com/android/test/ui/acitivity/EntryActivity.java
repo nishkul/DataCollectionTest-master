@@ -1,5 +1,6 @@
 package com.android.test.ui.acitivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -12,9 +13,11 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -32,8 +35,11 @@ import com.android.test.database.EntryHelper;
 import com.android.test.model.Category;
 import com.android.test.model.Entry;
 import com.android.test.utils.Common;
+import com.shephertz.app42.paas.sdk.android.App42API;
+import com.shephertz.app42.paas.sdk.android.App42CallBack;
+import com.shephertz.app42.paas.sdk.android.user.User;
+import com.shephertz.app42.paas.sdk.android.user.UserService;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -67,6 +73,8 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
     private Spinner mCategorySpinner;
     private TextView mError;
     private ArrayList<Category> mCategoryLists;
+    private TextView addCategorytv;
+    private ArrayAdapter<Category> myAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,14 +85,21 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         listener();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        myAdapter = new ArrayAdapter<Category>(this, android.R.layout.simple_spinner_item, mCategoryLists);
+        mCategorySpinner.setAdapter(myAdapter);
+    }
+
     private void setData() {
-        CategoryHelper categoryHelper = new CategoryHelper(this);
+        categoryHelper = new CategoryHelper(this);
         mCategoryLists = new ArrayList<>();
 
         mCategoryLists = categoryHelper.getCategoryLists();
         mCategoryLists.add(0, new Category());
-        ArrayAdapter<Category> myAdapter = new ArrayAdapter<Category>(this, android.R.layout.simple_spinner_item, mCategoryLists);
-        mCategorySpinner.setAdapter(myAdapter);
+        myAdapter = new ArrayAdapter<Category>(this, android.R.layout.simple_spinner_item, mCategoryLists);
 
     }
 
@@ -108,6 +123,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
         itAddress = (TextInputLayout) findViewById(R.id.it_edit_address);
         edt_Address = (EditText) findViewById(R.id.edt_address);
+        addCategorytv = (TextView) findViewById(R.id.addCategory_tv);
 
         curentRadio = (RadioButton) findViewById(R.id.radio_currentloc);
         customlocRatio = (RadioButton) findViewById(R.id.ratio_customloc);
@@ -126,6 +142,7 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
         btn_cancel.setOnClickListener(this);
         curentRadio.setOnClickListener(this);
         customlocRatio.setOnClickListener(this);
+        addCategorytv.setOnClickListener(this);
 
 //        mCategorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 //            @Override
@@ -161,6 +178,9 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             case R.id.btn_submit:
                 submit();
                 break;
+            case R.id.addCategory_tv:
+                addUserCategory();
+                break;
             case R.id.radio_currentloc:
                 if (curentRadio.isChecked()) {
                     getCurrentLocation();
@@ -173,6 +193,53 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
                 }
                 break;
         }
+    }
+
+    private void addUserCategory() {
+        LayoutInflater inflater = EntryActivity.this.getLayoutInflater();
+        View content = inflater.inflate(R.layout.add_category, null);
+        final EditText editText = (EditText) content.findViewById(R.id.category);
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(EntryActivity.this);
+        builder.setView(content)
+                .setTitle("Add book")
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+
+                        if (editText.getText() == null || editText.getText().toString().equals("") || editText.getText().toString().equals(" ")) {
+
+                            Toast.makeText(EntryActivity.this, getResources().getString(R.string.blank_error), Toast.LENGTH_SHORT).show();
+                        } else {
+
+                            Category category = new Category();
+                            category.setName(editText.getText().toString());
+                            result = categoryHelper.insertCategory(category);
+                            if (result != -1) {
+                                Toast.makeText(EntryActivity.this, "Your Category added successfully", Toast.LENGTH_SHORT).show();
+                                mCategoryLists.clear();
+                                mCategoryLists = categoryHelper.getCategoryLists();
+                                mCategoryLists.add(0, new Category());
+
+                                myAdapter = new ArrayAdapter<Category>(EntryActivity.this, android.R.layout.simple_spinner_item, mCategoryLists);
+                                mCategorySpinner.setAdapter(myAdapter);
+                            }
+
+
+                        }
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private Boolean validate() {
@@ -325,6 +392,24 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
             result = entryHelper.insertEntry(entry);
             if (result != -1) {
                 Toast.makeText(this, "Record inserted successfully", Toast.LENGTH_SHORT).show();
+
+                String userName = "manish";
+                String pwd = "wwwwwwww";
+                String emailId = "manish@manish.co.in";
+                UserService userService = App42API.buildUserService();
+                userService.createUser(userName, pwd, emailId, new App42CallBack() {
+                    public void onSuccess(Object response) {
+                        User user = (User) response;
+                        System.out.println("userName is " + user.getUserName());
+                        System.out.println("emailId is " + user.getEmail());
+                    }
+
+                    public void onException(Exception ex) {
+                        System.out.println("Exception Message" + ex.getMessage());
+                    }
+                });
+
+
                 finish();
             }
         }
@@ -336,22 +421,32 @@ public class EntryActivity extends AppCompatActivity implements View.OnClickList
 
 
     class SavePhotoTask extends AsyncTask<byte[], String, String> {
-        private File photoFile;
         private Bitmap bitmap;
 
         public SavePhotoTask(Bitmap profileBitmap) {
-            this.bitmap=profileBitmap;
+            this.bitmap = profileBitmap;
         }
 
 
         @Override
         protected String doInBackground(byte[]... jpeg) {
-          String fileName=  Common.getCurrentDateTime();
-            Common.createDirectoryAndSaveFile(bitmap,fileName);
+            String time = Common.getCurrentDateTime();
+            File myDir = new File(Environment.getExternalStorageDirectory(), "DataCollection/photo/");
+            myDir.mkdirs();
+            String fname = time + ".jpg";
+            File file = new File(myDir, fname);
+            if (file.exists()) file.delete();
+            try {
+                FileOutputStream out = new FileOutputStream(file);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+                out.flush();
+                out.close();
 
-            photoFile = new File(Environment.getExternalStorageDirectory(), "DataCollection/photo/" + fileName + ".jpg");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-            return (photoFile.getAbsolutePath());
+            return (file.getAbsolutePath());
         }
 
         @Override

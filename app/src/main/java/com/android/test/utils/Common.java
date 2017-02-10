@@ -9,12 +9,10 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.os.Environment;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -30,7 +28,7 @@ public class Common {
     static String timeZone;
 
     public Common(String userTimeZone) {
-        this.timeZone = userTimeZone;
+        timeZone = userTimeZone;
     }
 
     public Common() {
@@ -96,31 +94,7 @@ public class Common {
 
     }
 
-    public static String createDirectoryAndSaveFile(Bitmap imageToSave, String fileName) {
 
-        File direct = new File(Environment.getExternalStorageDirectory() + "/DataCollection/images/");
-        String path = null;
-        if (!direct.exists()) {
-            File file = new File("/DataCollection/images/");
-            file.mkdirs();
-        }
-
-        File file = new File(new File("/DataCollection/images/"), fileName);
-        if (file.exists()) {
-            file.delete();
-        }
-        try {
-            FileOutputStream out = new FileOutputStream(file);
-            path = file.getAbsolutePath();
-            imageToSave.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            out.flush();
-            out.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return path;
-    }
 }
 
 

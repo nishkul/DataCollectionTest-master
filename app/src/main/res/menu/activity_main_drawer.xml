@@ -3,17 +3,14 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_home"
-            android:title="Home" />
+                android:id="@+id/nav_map"
+                android:title="Home"/>
         <item
             android:id="@+id/nav_view"
             android:title="View List" />
         <item
-            android:id="@+id/nav_map"
-            android:title="In Map" />
-        <item
-            android:id="@+id/nav_manage"
-            android:title="Tools" />
+                android:id="@+id/nav_manage"
+                android:title="Send Data to Server"/>
     </group>
 
 

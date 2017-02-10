@@ -12,17 +12,28 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.android.test.R;
+import com.android.test.database.EntryHelper;
 import com.android.test.fragments.EntryViewFragment;
+import com.android.test.model.Data;
+import com.android.test.model.Entry;
+import com.backendless.Backendless;
+import com.backendless.async.callback.BackendlessCallback;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     Fragment fragment;
     private FloatingActionButton fab;
+    private EntryHelper entryHelper;
+    private ArrayList<Entry> arrylist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,20 +116,43 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_home) {
+        if (id == R.id.nav_map) {
             // Handle the camera action
         } else if (id == R.id.nav_view) {
             fragment = new EntryViewFragment();
             replaceFragment(fragment, "entrylist");
-        } else if (id == R.id.nav_map) {
-
         } else if (id == R.id.nav_manage) {
-
+            sendDataToServer();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void sendDataToServer() {
+
+
+        Data data = new Data();
+        entryHelper = new EntryHelper(this);
+        arrylist = entryHelper.getAllEntryToServerSend();
+        if (arrylist.size() > 0) {
+            data.setEntryArrayList(arrylist);
+            Backendless.Persistence.save(data, new BackendlessCallback<Data>() {
+                @Override
+                public void handleResponse(Data comment) {
+                    for (Entry entry : arrylist) {
+                        entryHelper.getEntrySendToServer(String.valueOf(entry.getId()));
+                        Log.v("send", "Data send to server ");
+                    }
+                    Toast.makeText(MainActivity.this, "Data send to server", Toast.LENGTH_SHORT).show();
+
+                }
+            });
+        } else {
+            Toast.makeText(MainActivity.this, "No data found..", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     private void replaceFragment(Fragment fragment, String tag) {

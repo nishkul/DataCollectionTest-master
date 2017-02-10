@@ -20,7 +20,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/pad_2">
-
+        <TextView
+                android:id="@+id/remove_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/margin_5"
+                android:paddingLeft="3dp"
+                android:layout_alignParentRight="true"
+                android:text="X"
+                android:padding="@dimen/margin_5"
+                android:textColor="@color/md_black_1000"
+                android:textSize="20sp"/>
         <ImageView
                 android:id="@+id/image_iv"
                 android:layout_width="100dp"
@@ -28,6 +38,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_gravity="center_horizontal|center_vertical"
                 android:padding="@dimen/margin_10"
+                android:src="@drawable/thumbnail"
                 android:layout_margin="@dimen/margin_5"
                 android:scaleType="centerCrop"
         />

@@ -273,14 +273,35 @@
                                 android:layout_marginBottom="3dp"
                                 android:layout_marginTop="5dp"
                                 android:background="@color/md_grey_400"/>
-                        <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+
+                        <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="horizontal"
                                 android:layout_marginLeft="7dp"
                                 android:layout_marginTop="10dp"
-                                android:text="@string/category"
-                                android:textColor="@color/md_black_1000"
-                                android:textSize="@dimen/txt_18"/>
+                                android:layout_weight="1">
+                            <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/category"
+                                    android:layout_weight=".9"
+                                    android:textColor="@color/md_black_1000"
+                                    android:textSize="@dimen/txt_18"/>
+
+
+                            <TextView
+                                    android:id="@+id/addCategory_tv"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight=".1"
+                                    android:text="+"
+                                    android:gravity="right"
+                                    android:padding="@dimen/margin_5"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/md_blue_800"
+                                    android:textSize="@dimen/txt_18"/>
+                        </LinearLayout>
 
                         <Spinner
                                 android:id="@+id/categorySpinner"

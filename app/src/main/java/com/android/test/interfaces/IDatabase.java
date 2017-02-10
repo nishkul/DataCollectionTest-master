@@ -6,6 +6,6 @@ package com.android.test.interfaces;
 
 public interface IDatabase {
 
-    public static final String DATABASE_NAME = "dataCollection.db";
-    public static final int COLUNM_VERSION = 1;
+    String DATABASE_NAME = "dataCollection.db";
+    int COLUNM_VERSION = 1;
 }

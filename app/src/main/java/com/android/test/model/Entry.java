@@ -11,7 +11,34 @@ public class Entry {
     private String description;
     private String lat;
     private String lang;
+    private String address;
     private int id;
+    private int sendtoserver;
+    private int category;
+
+    public Entry(String title, String description) {
+        this.title = title;
+        this.description = description;
+    }
+
+    public Entry() {
+    }
+
+    public int getSendtoserver() {
+        return sendtoserver;
+    }
+
+    public void setSendtoserver(int sendtoserver) {
+        this.sendtoserver = sendtoserver;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
     public String getTitle() {
         return title;
@@ -68,6 +95,4 @@ public class Entry {
     public void setImage(String image) {
         this.image = image;
     }
-
-    private int category;
 }

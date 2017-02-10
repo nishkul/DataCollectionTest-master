@@ -4,18 +4,17 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.test.R;
-import com.android.test.model.Category;
+import com.android.test.database.EntryHelper;
 import com.android.test.model.Entry;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -41,18 +40,28 @@ public class EntryAdaptor extends RecyclerView.Adapter<EntryAdaptor.ViewHolder> 
         return new ViewHolder(view);
     }
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         final Entry entry = categoryList.get(position);
         holder.mtitle.setText(entry.getTitle());
         holder.mDesc.setText(entry.getTitle());
 
        // File file = new File(DOUBT_DIR + path);
        if (entry.getImage()!=null){
-           Log.v("ssssssss",entry.getImage());
            Bitmap bmp = BitmapFactory.decodeFile(entry.getImage());
 
            holder.mImage.setImageBitmap(bmp);
        }
+        holder.mReomve.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EntryHelper entryHelper = new EntryHelper(mContext);
+                if (entryHelper.deleteEntry(String.valueOf(entry.getId())) != -1) {
+                    Toast.makeText(mContext, "Entry deleted succssfully", Toast.LENGTH_SHORT).show();
+                    categoryList.remove(position);
+                    notifyDataSetChanged();
+                }
+            }
+        });
 
     }
 
@@ -70,6 +79,7 @@ public class EntryAdaptor extends RecyclerView.Adapter<EntryAdaptor.ViewHolder> 
         public final View mView;
         public final TextView mDesc;
         public final TextView mtitle;
+        public final TextView mReomve;
         private final ImageView mImage;
 
         public ViewHolder(View itemView) {
@@ -77,6 +87,7 @@ public class EntryAdaptor extends RecyclerView.Adapter<EntryAdaptor.ViewHolder> 
             mView = itemView;
             mtitle = (TextView) mView.findViewById(R.id.name_tv);
             mDesc = (TextView) mView.findViewById(R.id.desc_tv);
+            mReomve = (TextView) mView.findViewById(R.id.remove_tv);
             mImage = (ImageView) mView.findViewById(R.id.image_iv);
         }
     }

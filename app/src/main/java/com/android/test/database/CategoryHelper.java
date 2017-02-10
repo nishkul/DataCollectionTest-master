@@ -3,6 +3,7 @@ package com.android.test.database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -25,7 +26,7 @@ public class CategoryHelper {
     ArrayList<Category> arrayList = new ArrayList();
 
     public CategoryHelper(Context context) {
-        this.context = context;
+        CategoryHelper.context = context;
         arrayList.add(new Category(1, "Theatre"));
         arrayList.add(new Category(2, "School"));
         arrayList.add(new Category(3, "Hospital"));
@@ -34,11 +35,34 @@ public class CategoryHelper {
         arrayList.add(new Category(6, "Govt Bldg"));
         arrayList.add(new Category(7, "Mall"));
         arrayList.add(new Category(8, "Park"));
-        insertCategory(arrayList);
+        insertCategoryList(arrayList);
     }
 
+    public long insertCategory(Category category) throws SQLException {
+        SQLiteDatabase db = null;
+        long rowid = -1;
+        try {
+            if (category != null) {
+                if (db == null || !db.isOpen()) {
+                    db = new DBHelper(context).writeDatabases();
+                }
 
-    public void insertCategory(ArrayList<Category> list) {
+                ContentValues values = new ContentValues();
+                values.put(COLUMN_CATEGORY_NAME, category.getName());
+
+
+                rowid = db.insertWithOnConflict(ICategoryTable.TABLE, ICategoryTable.COLUMN_ID, values, SQLiteDatabase.CONFLICT_REPLACE);
+                return rowid;
+            }
+
+        } finally {
+            if (db != null)
+                db.close();
+        }
+        return rowid;
+    }
+
+    public void insertCategoryList(ArrayList<Category> list) {
         SQLiteDatabase db = null;
         if (db == null || !db.isOpen()) {
             db = new DBHelper(context).getWritableDatabase();
